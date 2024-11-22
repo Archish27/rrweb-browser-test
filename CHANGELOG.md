@@ -1,5 +1,11 @@
 # rrweb-browser-test
 
+## 2.0.1
+
+### Patch Changes
+
+- 76f7ce2: Exporting browser test function
+
 ## 2.0.0
 
 ### Major Changes
