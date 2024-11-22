@@ -47,5 +47,8 @@
   "bugs": {
     "url": "https://github.com/Archish27/rrweb-browser-test/issues"
   },
-  "homepage": "https://github.com/Archish27/rrweb-browser-test#readme"
+  "homepage": "https://github.com/Archish27/rrweb-browser-test#readme",
+  "dependencies": {
+    "@rrweb/types": "^2.0.0-alpha.17"
+  }
 }
