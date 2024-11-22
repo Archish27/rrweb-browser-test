@@ -1,6 +1,6 @@
 {
   "name": "rrweb-browser-test",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "RRWeb events to generating browser test scripts",
   "main": "dist/index.js",
   "type": "module",
