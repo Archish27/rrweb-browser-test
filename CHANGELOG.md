@@ -1,5 +1,11 @@
 # rrweb-browser-test
 
+## 2.1.1
+
+### Patch Changes
+
+- 39e5ed9: Bug fix for generating tests
+
 ## 2.1.0
 
 ### Minor Changes
