@@ -1,5 +1,11 @@
 # rrweb-browser-test
 
+## 2.1.0
+
+### Minor Changes
+
+- 5ecdf00: :sparle: Support for puppeteer, cypress and selenium
+
 ## 2.0.1
 
 ### Patch Changes
