@@ -12,15 +12,14 @@ import {
   type viewportResizeData,
 } from '@rrweb/types';
 import { buildNodeMapFromFullSnapshots, indent } from '../utils';
-import type { BrowserTests } from '../types';
 
 export const generateSeleniumTests = (
   events: Array<eventWithTime | string>,
-): BrowserTests => {
+): string => {
   let code = '';
 
   code += `const { Builder, By, until } = require('selenium-webdriver');\n\n`;
-  code += `describe('Generated Selenium Test from rrweb events', () => {\n`;
+  code += `describe('TODO: name the test block', () => {\n`;
   code += `${indent(1)}let driver;\n\n`;
   code += `${indent(1)}beforeAll(async () => {\n`;
   code += `${indent(2)}driver = await new Builder().forBrowser('chrome').build();\n`;
@@ -29,7 +28,7 @@ export const generateSeleniumTests = (
   code += `${indent(2)}await driver.quit();\n`;
   code += `${indent(1)}});\n\n`;
 
-  code += `${indent(1)}test('Replay rrweb events', async () => {\n`;
+  code += `${indent(1)}test('TODO: name the test case', async () => {\n`;
 
   const fullSnapshotEvents = events.filter(
     (event) => (event as eventWithTime).type === EventType.FullSnapshot,
@@ -117,11 +116,5 @@ export const generateSeleniumTests = (
   code += `${indent(1)}});\n`;
   code += `});\n`;
 
-  const browserTests: BrowserTests = {
-    toCode: () => {
-      return code;
-    },
-  };
-
-  return browserTests;
+  return code;
 };

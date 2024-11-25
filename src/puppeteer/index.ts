@@ -12,15 +12,14 @@ import {
   type viewportResizeData,
 } from '@rrweb/types';
 import { buildNodeMapFromFullSnapshots, indent } from '../utils';
-import type { BrowserTests } from '../types';
 
 export const generatePuppeteerTests = (
   events: Array<eventWithTime | string>,
-): BrowserTests => {
+): string => {
   let code = '';
 
   code += `const puppeteer = require('puppeteer');\n\n`;
-  code += `describe('Generated Puppeteer Test from rrweb events', () => {\n`;
+  code += `describe('TODO: name the test block', () => {\n`;
   code += `${indent(1)}let browser, page;\n\n`;
   code += `${indent(1)}beforeAll(async () => {\n`;
   code += `${indent(2)}browser = await puppeteer.launch();\n`;
@@ -30,7 +29,7 @@ export const generatePuppeteerTests = (
   code += `${indent(2)}await browser.close();\n`;
   code += `${indent(1)}});\n\n`;
 
-  code += `${indent(1)}test('Replay rrweb events', async () => {\n`;
+  code += `${indent(1)}test('TODO: name the test case', async () => {\n`;
 
   const fullSnapshotEvents = events.filter(
     (event) => (event as eventWithTime).type === EventType.FullSnapshot,
@@ -120,11 +119,5 @@ export const generatePuppeteerTests = (
   code += `${indent(1)}});\n`;
   code += `});\n`;
 
-  const browserTests: BrowserTests = {
-    toCode: () => {
-      return code;
-    },
-  };
-
-  return browserTests;
+  return code;
 };

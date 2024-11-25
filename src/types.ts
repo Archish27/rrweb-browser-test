@@ -2,11 +2,6 @@ export type TestOptions = {
   framework: 'playwright' | 'puppeteer' | 'cypress' | 'selenium';
 };
 
-export type BrowserTests = {
-  toCode: () => string;
-  toMap?: () => Map<number, string>;
-};
-
 export type SerializedNodeWithId = {
   id: number;
   tagName?: string;

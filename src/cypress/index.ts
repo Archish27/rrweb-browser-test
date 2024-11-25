@@ -11,16 +11,15 @@ import {
   type scrollData,
   type viewportResizeData,
 } from '@rrweb/types';
-import type { BrowserTests } from '../types';
 import { buildNodeMapFromFullSnapshots, indent } from '../utils';
 
 export const generateCypressTests = (
   events: Array<eventWithTime | string>,
-): BrowserTests => {
+): string => {
   let code = '';
 
-  code += `describe('Generated Cypress Test from rrweb events', () => {\n`;
-  code += `  it('should replay events accurately', () => {\n`;
+  code += `describe('TODO: name the test block', () => {\n`;
+  code += `  it('TODO: name the test case', () => {\n`;
 
   const fullSnapshotEvents = events.filter(
     (event) => (event as eventWithTime).type === EventType.FullSnapshot,
@@ -115,9 +114,5 @@ export const generateCypressTests = (
   code += `  });\n`;
   code += `});\n`;
 
-  const browserTests: BrowserTests = {
-    toCode: () => code,
-  };
-
-  return browserTests;
+  return code;
 };

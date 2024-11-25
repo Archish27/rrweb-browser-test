@@ -11,16 +11,15 @@ import {
   type scrollData,
   type viewportResizeData,
 } from '@rrweb/types';
-import type { BrowserTests } from '../types';
 import { buildNodeMapFromFullSnapshots, indent } from '../utils';
 
 export const generatePlaywrightTests = (
   events: Array<eventWithTime | string>,
-): BrowserTests => {
+): string => {
   let code = '';
 
   code += `import { test, expect } from '@playwright/test';\n\n`;
-  code += `test('Generated Playwright Test from rrweb events with tabs', async ({ page, context }) => {\n`;
+  code += `test('TODO: name the test block', async ({ page, context }) => {\n`;
 
   const fullSnapshotEvents = events.filter(
     (event) => (event as eventWithTime).type === EventType.FullSnapshot,
@@ -121,11 +120,5 @@ export const generatePlaywrightTests = (
 
   code += `${indent(1)}});\n`;
 
-  const browserTests: BrowserTests = {
-    toCode: () => {
-      return code;
-    },
-  };
-
-  return browserTests;
+  return code;
 };

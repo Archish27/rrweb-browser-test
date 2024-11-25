@@ -3,12 +3,12 @@ import { generateCypressTests } from './cypress';
 import { generatePlaywrightTests } from './playwright';
 import { generatePuppeteerTests } from './puppeteer';
 import { generateSeleniumTests } from './selenium';
-import { TestFramework, type BrowserTests, type TestOptions } from './types';
+import { TestFramework, type TestOptions } from './types';
 
 const generateTests = (
   events: Array<eventWithTime | string>,
   options?: TestOptions,
-): BrowserTests => {
+): string => {
   switch (options?.framework) {
     case TestFramework.PLAYWRIGHT:
       return generatePlaywrightTests(events);
@@ -26,6 +26,6 @@ const generateTests = (
 export const generateBrowserTests = (
   events: Array<eventWithTime | string>,
   options?: TestOptions,
-): BrowserTests => {
+): string => {
   return generateTests(events, options);
 };
