@@ -14,32 +14,29 @@ import {
 import type { BrowserTests } from '../types';
 import { buildNodeMapFromFullSnapshots, indent } from '../utils';
 
-export const generatePlaywrightTests = (
+export const generateCypressTests = (
   events: Array<eventWithTime | string>,
 ): BrowserTests => {
   let code = '';
 
-  code += `import { test, expect } from '@playwright/test';\n\n`;
-  code += `test('Generated Playwright Test from rrweb events with tabs', async ({ page, context }) => {\n`;
+  code += `describe('Generated Cypress Test from rrweb events', () => {\n`;
+  code += `  it('should replay events accurately', () => {\n`;
 
   const fullSnapshotEvents = events.filter(
     (event) => (event as eventWithTime).type === EventType.FullSnapshot,
   ) as fullSnapshotEvent[];
   const nodeMap = buildNodeMapFromFullSnapshots(fullSnapshotEvents);
 
-  code += `${indent(2)}const newTab = await context.newPage();\n`;
-
   events.forEach((event: eventWithTime | string) => {
     const e = event as eventWithTime;
     switch (e.type) {
       case EventType.Meta:
         if (e.data.href) {
-          code += `${indent(2)}await page.goto('${e.data.href}');\n`;
-          code += `${indent(2)}await expect(page).toHaveURL('${e.data.href}');\n`;
+          code += `${indent(3)}cy.visit('${e.data.href}');\n`;
+          code += `${indent(3)}cy.url().should('include', '${e.data.href}');\n`; // Assert URL after navigation
         }
         if (e.data.width && e.data.height) {
-          code += `${indent(2)}await page.setViewportSize({ width: ${e.data.width}, height: ${e.data.height} });\n`;
-          code += `${indent(2)}await expect(page).toHaveViewportSize({ width: ${e.data.width}, height: ${e.data.height} });\n`; // Assert viewport size
+          code += `${indent(3)}cy.viewport(${e.data.width}, ${e.data.height});\n`;
         }
         break;
 
@@ -51,7 +48,7 @@ export const generatePlaywrightTests = (
           case IncrementalSource.MouseMove || IncrementalSource.TouchMove:
             d = data as mousemoveData;
             if (d.positions?.[0]?.x && d.positions?.[0]?.y) {
-              code += `${indent(2)}await page.mouse.move(${d.positions[0].x}, ${d.positions[0].y});\n`;
+              code += `${indent(3)}cy.get('body').trigger('mousemove', { clientX: ${d.positions[0].x}, clientY: ${d.positions[0].y} });\n`;
             }
             break;
 
@@ -62,53 +59,49 @@ export const generatePlaywrightTests = (
               const id = clickNode?.attributes?.id
                 ? `#${clickNode?.attributes?.id}`
                 : clickNode?.tagName === 'nav'
-                  ? `${clickNode?.tagName}:text-is("${clickNode.childNodes
+                  ? `"${clickNode.childNodes
                       ?.filter((f) => f.tagName === 'a')
                       ?.map((node) =>
                         node.childNodes?.map(
                           (n1) => (n1 as any)?.['textContent'],
                         ),
                       )
-                      .join(' ')}")`
+                      .join(' ')}"`
                   : `${clickNode?.tagName}.${clickNode?.attributes?.class}`;
-
-              if (d.x && d.y) {
-                code += `${indent(2)}await page.locator(\`${id}\`).click();\n`;
-                code += `${indent(2)}await expect(page.locator(\`${id}\`)).toBeVisible();\n`; // Assert visibility after click
+              if (clickNode?.tagName === 'nav') {
+                code += `${indent(3)}cy.contains('${clickNode?.tagName}', ${id}).click();\n`;
+              } else {
+                code += `${indent(3)}cy.get('${id}').click();\n`;
               }
-              break;
             }
             break;
 
           case IncrementalSource.Scroll:
             d = data as scrollData;
             if (d.x && d.y) {
-              code += `${indent(2)}await page.mouse.wheel(() => { document.querySelector('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]').scrollTo(${d.x}, ${d.y}); });\n`;
-              code += `${indent(2)}await expect(page.locator('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]')).toBeVisible();\n`; // Assert element visibility after scroll
+              code += `${indent(3)}cy.get('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]').scrollTo(${d.x}, ${d.y});\n`;
             }
             break;
 
           case IncrementalSource.ViewportResize:
             d = data as viewportResizeData;
             if (d.width && d.height) {
-              code += `${indent(2)}await page.setViewportSize({ width: ${d.width}, height: ${d.height} });\n`;
-              code += `${indent(2)}await expect(page).toHaveViewportSize({ width: ${d.width}, height: ${d.height} });\n`; // Assert viewport size
+              code += `${indent(3)}cy.viewport(${d.width}, ${d.height});\n`;
             }
             break;
 
           case IncrementalSource.Input:
             d = data as inputData;
             if (d.text) {
-              code += `${indent(2)}await page.fill('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]', '${d.text}');\n`;
-              code += `${indent(2)}await expect(page.locator('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]')).toHaveValue('${d.text}');\n`; // Assert input value
+              code += `${indent(3)}cy.get('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]').type('${d.text}');\n`;
+              code += `${indent(3)}cy.get('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]').should('have.value', '${d.text}');\n`; // Assert input value
             }
             break;
 
           case IncrementalSource.MediaInteraction:
             d = data as mediaInteractionData;
             if (d.type) {
-              code += `${indent(2)}await page.$eval('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]', el => el.${d.type}());\n`;
-              code += `${indent(2)}await expect(page.locator('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]')).toBeVisible();\n`; // Assert visibility of the media element
+              code += `${indent(3)}cy.get('[data-id="${nodeMap.get(d.id)?.attributes?.id}"]').then((el) => el[0].${d.type}());\n`;
             }
             break;
         }
@@ -119,12 +112,11 @@ export const generatePlaywrightTests = (
     }
   });
 
-  code += `${indent(1)}});\n`;
+  code += `  });\n`;
+  code += `});\n`;
 
   const browserTests: BrowserTests = {
-    toCode: () => {
-      return code;
-    },
+    toCode: () => code,
   };
 
   return browserTests;
